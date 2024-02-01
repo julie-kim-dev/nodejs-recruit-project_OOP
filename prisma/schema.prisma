@@ -44,7 +44,6 @@ model Documents {
   documentId Int @id @default(autoincrement()) @map("documentId")
   userId Int @map("userId")
   title String @map("title")
-  name String @map("name")
   content String @db.Text @map("content")
   state State @default(APPLY) @map("state")
   createdAt DateTime @default(now()) @map("createdAt")

@@ -14,7 +14,7 @@ router.post('/documents', authMiddleware, async (req, res, next) => {
       userId: +userId,
       title,
       content,
-      state,
+      state: state,
     },
   });
   return res.status(201).json({ data: document });

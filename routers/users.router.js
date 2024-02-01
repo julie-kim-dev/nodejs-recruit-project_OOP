@@ -35,7 +35,7 @@ router.post('/sign-up', async (req, res, next) => {
     data: {
       userId: user.userId,
       age,
-      gender,
+      gender: gender.toUpperCase(),
       profileImage,
     },
   });

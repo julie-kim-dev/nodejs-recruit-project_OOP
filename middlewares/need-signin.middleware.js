@@ -24,6 +24,7 @@ export default async function (req, res, next) {
     }
 
     req.user = user;
+    // req.locals.user = user;
 
     next();
   } catch (err) {
@@ -37,7 +38,7 @@ export default async function (req, res, next) {
       default:
         return res
           .status(401)
-          .json({ message: error.message ?? '비정상적인 요청입니다.' });
+          .json({ message: err.message ?? '비정상적인 요청입니다.' });
     }
   }
 }

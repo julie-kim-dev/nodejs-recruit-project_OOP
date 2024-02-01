@@ -70,11 +70,11 @@ router.get('/users', authMiddleware, async (req, res, next) => {
     select: {
       userId: true,
       email: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
       userInfos: {
         select: {
-          name: true,
           age: true,
           gender: true,
           profileImage: true,

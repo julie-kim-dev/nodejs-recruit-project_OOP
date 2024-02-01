@@ -20,4 +20,26 @@ router.post('/documents', authMiddleware, async (req, res, next) => {
   return res.status(201).json({ data: document });
 });
 
+// 이력서 목록 조회
+router.get('/documents', async (req, res, next) => {
+  //   const { name } = req.body;
+
+  const documents = await prisma.documents.findMany({
+    select: {
+      documentId: true,
+      userId: true,
+      title: true,
+      content: true,
+      state: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return res.status(200).json({ data: documents });
+});
+
 export default router;

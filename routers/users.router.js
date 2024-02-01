@@ -2,6 +2,7 @@ import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import authMiddleware from '../middlewares/need-signin.middleware.js';
 
 const router = express.Router();
 
@@ -14,6 +15,10 @@ router.post('/sign-up', async (req, res, next) => {
 
   if (isExistUser) {
     return res.status(409).json({ message: '이미 존재하는 이메일입니다.' });
+  } else if (password.length < 6) {
+    return res
+      .status(409)
+      .json({ message: '비밀번호는 6자리 이상이어야 합니다.' });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -49,5 +54,28 @@ router.post('/sign-in', async (req, res, next) => {
 
   res.cookie('authorization', `Bearer ${token}`);
   return res.status(200).json({ message: '로그인 성공' });
+});
+
+// 유저 상세정보 조회
+router.get('/users', authMiddleware, async (req, res, next) => {
+  const { userId } = req.user;
+
+  const user = await prisma.users.findFirst({
+    where: { userId: +userId },
+    select: {
+      userId: true,
+      email: true,
+      createdAt: true,
+      updatedAt: true,
+      userInfos: {
+        select: {
+          name: true,
+          age: true,
+          gender: true,
+          profileImage: true,
+        },
+      },
+    },
+  });
 });
 export default router;

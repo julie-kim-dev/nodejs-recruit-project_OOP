@@ -43,7 +43,6 @@ model Documents {
   userId Int @map("userId")
   title String @map("title")
   content String @db.Text @map("content")
-  name String @map("name")
   state State @default(APPLY) @map("state")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")

@@ -17,11 +17,15 @@ model Users {
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
+  userInfos UserInfos?
+  documents Documents[]
+
   @@map("Users")
 }
 
 model UserInfos {
   userInfoId Int @id @default(autoincrement()) @map("userInfoId")
+  userId Int @unique @map("userId")
   name String @map("name")
   age Int? @map("age")
   gender Gender? @map("gender")
@@ -29,11 +33,14 @@ model UserInfos {
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
   @@map("UserInfos")
 }
 
 model Documents {
   documentId Int @id @default(autoincrement()) @map("documentId")
+  userId Int @map("userId")
   title String @map("title")
   content String @db.Text @map("content")
   name String @map("name")
@@ -41,6 +48,8 @@ model Documents {
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  
   @@map("Documents")
 }
 

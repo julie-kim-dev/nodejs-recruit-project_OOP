@@ -5,7 +5,7 @@ import DocumentsRouter from './routers/documents.router.js';
 // import AuthRouter from './routers/auth.router.js';
 
 const app = express();
-const PORT = 3019;
+const PORT = 3020;
 
 app.use(express.json());
 app.use(cookieParser());

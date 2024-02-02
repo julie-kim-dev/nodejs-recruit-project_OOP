@@ -22,7 +22,7 @@ router.post('/documents', authMiddleware, async (req, res, next) => {
 
 // 이력서 목록 조회
 router.get('/documents', async (req, res, next) => {
-  //   const { name } = req.body;
+  const { name } = req.body;
 
   const documents = await prisma.documents.findMany({
     select: {
@@ -40,6 +40,67 @@ router.get('/documents', async (req, res, next) => {
   });
 
   return res.status(200).json({ data: documents });
+});
+
+// 이력서 상세 조회
+router.get('/documents/:documentId', async (req, res, next) => {
+  const { documentId } = req.params;
+
+  const document = await prisma.documents.findFirst({
+    where: { documentId: +documentId },
+    select: {
+      documentId: true,
+      userId: true,
+      title: true,
+      state: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return res.status(200).json({ data: document });
+});
+
+// 이력서 수정
+router.patch(
+  '/documents/:documentId',
+  authMiddleware,
+  async (req, res, next) => {
+    const { documentId } = req.params;
+    const { title, content, state } = req.body;
+
+    const editDocument = await prisma.documents.findById(documentId).exec();
+    if (!editDocument) {
+      return res
+        .status(404)
+        .json({ errorMessage: '존재하지 않는 이력서 데이터입니다.' });
+      if (title) {
+        const targetDocument = await prisma.documents.findOne({ title }).exec();
+        if (targetDocument) {
+          targetDocument.title = editDocument.title;
+          await targetDocument.save();
+        }
+        currentTodo.order = order;
+      }
+    }
+  }
+);
+
+// 이력서 삭제
+router.delete('/documents/:documentId', authMiddleware, async (req, res) => {
+  const { documentId } = req.params;
+
+  const deleteDocuments = await prisma.documents.findById(documentId).exec();
+  if (!deleteDocuments) {
+    return res
+      .status(404)
+      .json({ errorMessage: '존재하지 않는 이력서입니다.' });
+  }
+
+  await prisma.documents.deleteOne({ documentId: documentId }).exec();
+
+  return res.status(200).json({});
 });
 
 export default router;

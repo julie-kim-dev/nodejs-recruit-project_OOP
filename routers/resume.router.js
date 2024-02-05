@@ -12,7 +12,7 @@ router.get('/', async (req, res, next) => {
   if (!['resumeId', 'state'].includes(orderKey)) {
     return res.status(400).json({ message: 'orderKey가 올바르지 않습니다.' });
   }
-  if (!['asc', 'desc'].includes(orderValue.toLLowerCase())) {
+  if (!['asc', 'desc'].includes(orderValue.toLowerCase())) {
     return res.status(400).json({ message: 'orderValue가 올바르지 않습니다.' });
   }
 
@@ -29,11 +29,6 @@ router.get('/', async (req, res, next) => {
     },
     orderBy: [{ [orderKey]: orderValue.toLowerCase() }],
   });
-
-  // resumes.forEach((resume) => {
-  //   resume.name = resume.user.name;
-  //   delete resume.user;
-  // });
 
   return res.json({ data: resumes });
 });
@@ -86,7 +81,7 @@ router.post('/', authMiddleware, async (req, res, next) => {
     },
   });
 
-  return res.status(201).json({});
+  return res.status(201).json({ message: '이력서 작성이 완료되었습니다.' });
 });
 
 // 이력서 수정
@@ -113,21 +108,6 @@ router.patch('/:resumeId', authMiddleware, async (req, res, next) => {
   if (!state) {
     return res.status(400).json({
       message: '이력서 상태는 필수값입니다.',
-    });
-  }
-
-  if (
-    [
-      'APPLY',
-      'DROP',
-      'PASS',
-      'INTERVIEW1',
-      'INTERVIEW2',
-      'FINAL_PASS',
-    ].includes(state)
-  ) {
-    return res.status(400).json({
-      message: '올바르지 않은 상태값입니다.',
     });
   }
 
@@ -158,7 +138,7 @@ router.patch('/:resumeId', authMiddleware, async (req, res, next) => {
       state,
     },
   });
-  return res.status(201).end();
+  return res.status(201).json({ message: '이력서 수정이 완료되었습니다.' });
 });
 
 // 이력서 삭제

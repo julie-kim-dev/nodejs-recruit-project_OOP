@@ -46,19 +46,9 @@ router.post('/sign-up', async (req, res, next) => {
     data: { email, password: hashedPassword, name },
   });
 
-  // UserInfos 테이블에 사용자 정보 추가
-  const userInfo = await prisma.userInfos.create({
-    data: {
-      userId: user.userId,
-      age,
-      gender, //: gender.toUpperCase(),
-      profileImage,
-    },
-  });
-
   return res
     .status(201)
-    .json({ message: '회원가입이 완료되었습니다.', data: userInfo });
+    .json({ message: '회원가입이 완료되었습니다.', email, name });
 });
 
 // 로그인
@@ -79,15 +69,17 @@ router.post('/sign-in', async (req, res, next) => {
     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
   }
 
-  const token = jwt.sign({ userId: user.userId }, 'custom-secret-key');
+  const accessToken = jwt.sign({ userId: user.userId }, 'custom-secret-key', {
+    expiresIn: '12h',
+  });
 
-  res.cookie('authorization', `Bearer ${token}`);
-  return res.status(200).json({ message: '로그인 성공' });
+  // res.cookie('authorization', `Bearer ${accessToken}`);
+  return res.status(200).json({ message: '로그인 성공', accessToken });
 });
 
 // 유저 상세정보 조회
-router.get('/', authMiddleware, async (req, res, next) => {
-  const { userId } = req.user;
+router.get('/me', authMiddleware, async (req, res, next) => {
+  const { userId } = res.locals.user;
 
   const user = await prisma.users.findFirst({
     where: { userId: +userId },

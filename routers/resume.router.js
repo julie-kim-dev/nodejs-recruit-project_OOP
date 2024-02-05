@@ -118,7 +118,7 @@ router.patch('/:resumeId', authMiddleware, async (req, res, next) => {
   });
   if (!resume) {
     return res.status(400).json({
-      message: '존재하지 않는 이력서입니다.',
+      message: '이력서 조회에 실패하였습니다.',
     });
   }
 
@@ -158,7 +158,7 @@ router.delete('/:resumeId', authMiddleware, async (req, res, next) => {
   });
   if (!resume) {
     return res.status(400).json({
-      message: '존재하지 않는 이력서입니다.',
+      message: '이력서 조회에 실패하였습니다.',
     });
   }
 

@@ -4,99 +4,196 @@ import authMiddleware from '../middlewares/need-signin.middleware.js';
 
 const router = express.Router();
 
-// 이력서 생성
-router.post('/', authMiddleware, async (req, res, next) => {
-  const { title, content, state } = req.body;
-  const { userId } = req.user;
-
-  const document = await prisma.documents.create({
-    data: {
-      userId: +userId,
-      title,
-      content,
-      state: state,
-    },
-  });
-  return res.status(201).json({ data: document });
-});
-
 // 이력서 목록 조회
 router.get('/', async (req, res, next) => {
-  const { name } = req.body;
+  const orderKey = req.query.orderKey ?? 'resumeId';
+  const orderValue = req.query.orderValue ?? 'desc';
 
-  const documents = await prisma.documents.findMany({
+  if (!['resumeId', 'state'].includes(orderKey)) {
+    return res.status(400).json({ message: 'orderKey가 올바르지 않습니다.' });
+  }
+  if (!['asc', 'desc'].includes(orderValue.toLLowerCase())) {
+    return res.status(400).json({ message: 'orderValue가 올바르지 않습니다.' });
+  }
+
+  const resumes = await prisma.resume.findMany({
     select: {
-      documentId: true,
-      userId: true,
+      resumeId: true,
       title: true,
       content: true,
       state: true,
+      user: {
+        select: { name: true },
+      },
       createdAt: true,
-      updatedAt: true,
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: [{ [orderKey]: orderValue.toLowerCase() }],
   });
 
-  return res.status(200).json({ data: documents });
+  // resumes.forEach((resume) => {
+  //   resume.name = resume.user.name;
+  //   delete resume.user;
+  // });
+
+  return res.json({ data: resumes });
 });
 
 // 이력서 상세 조회
-router.get('/:documentId', async (req, res, next) => {
-  const { documentId } = req.params;
-
-  const document = await prisma.documents.findFirst({
-    where: { documentId: +documentId },
+router.get('/:resumeId', async (req, res, next) => {
+  const resumeId = req.params.resumeId;
+  if (!resumeId) {
+    return res.status(400).json({ message: 'resumeId는 필수값입니다.' });
+  }
+  const resume = await prisma.resume.findFirst({
+    where: {
+      resumeId: Number(resumeId),
+    },
     select: {
-      documentId: true,
-      userId: true,
+      resumeId: true,
       title: true,
-      state: true,
       content: true,
+      state: true,
+      user: {
+        select: { name: true },
+      },
       createdAt: true,
-      updatedAt: true,
     },
   });
 
-  return res.status(200).json({ data: document });
+  if (!resume) {
+    return res.json({ data: {} });
+  }
+
+  return res.json({ data: resume });
+});
+
+// 이력서 생성
+router.post('/', authMiddleware, async (req, res, next) => {
+  const user = res.locals.user;
+  const { title, content } = req.body;
+  if (!title) {
+    return res.status(400).json({ message: '이력서 제목은 필수값입니다.' });
+  }
+  if (!content) {
+    return res.status(400).json({ message: '자기소개는 필수값입니다.' });
+  }
+  await prisma.resume.create({
+    data: {
+      title,
+      content,
+      state: 'APPLY',
+      userId: user.userId,
+    },
+  });
+
+  return res.status(201).json({});
 });
 
 // 이력서 수정
-router.patch('/:documentId', authMiddleware, async (req, res, next) => {
-  const { documentId } = req.params;
+router.patch('/:resumeId', authMiddleware, async (req, res, next) => {
+  const user = res.locals.user;
+  const resumeId = req.params.resumeId;
   const { title, content, state } = req.body;
 
-  const editDocument = await prisma.documents.findById(documentId).exec();
-  if (!editDocument) {
-    return res
-      .status(404)
-      .json({ errorMessage: '존재하지 않는 이력서 데이터입니다.' });
-    if (title) {
-      const targetDocument = await prisma.documents.findOne({ title }).exec();
-      if (targetDocument) {
-        targetDocument.title = editDocument.title;
-        await targetDocument.save();
-      }
-      currentTodo.order = order;
-    }
+  if (!resumeId) {
+    return res.status(400).json({
+      message: 'resumeId는 필수값입니다.',
+    });
   }
+  if (!title) {
+    return res.status(400).json({
+      message: '이력서 제목은 필수값입니다.',
+    });
+  }
+  if (!content) {
+    return res.status(400).json({
+      message: '자기소개는 필수값입니다.',
+    });
+  }
+  if (!state) {
+    return res.status(400).json({
+      message: '이력서 상태는 필수값입니다.',
+    });
+  }
+
+  if (
+    [
+      'APPLY',
+      'DROP',
+      'PASS',
+      'INTERVIEW1',
+      'INTERVIEW2',
+      'FINAL_PASS',
+    ].includes(state)
+  ) {
+    return res.status(400).json({
+      message: '올바르지 않은 상태값입니다.',
+    });
+  }
+
+  const resume = await prisma.resume.findFirst({
+    where: {
+      resumeId: +resumeId,
+    },
+  });
+  if (!resume) {
+    return res.status(400).json({
+      message: '존재하지 않는 이력서입니다.',
+    });
+  }
+
+  if (resume.userId !== user.userId) {
+    return res.status(400).json({
+      message: '올바르지 않은 요청입니다.',
+    });
+  }
+
+  await prisma.resume.update({
+    where: {
+      resumeId: +resumeId,
+    },
+    data: {
+      title,
+      content,
+      state,
+    },
+  });
+  return res.status(201).end();
 });
 
 // 이력서 삭제
-router.delete('/:documentId', authMiddleware, async (req, res) => {
-  const { documentId } = req.params;
+router.delete('/:resumeId', authMiddleware, async (req, res, next) => {
+  const user = res.locals.user;
+  const resumeId = req.params.resumeId;
 
-  const deleteDocuments = await prisma.documents.findById(documentId).exec();
-  if (!deleteDocuments) {
-    return res
-      .status(404)
-      .json({ errorMessage: '존재하지 않는 이력서입니다.' });
+  if (!resumeId) {
+    return res.status(400).json({
+      message: 'resumeId는 필수값입니다.',
+    });
+  }
+  const resume = await prisma.resume.findFirst({
+    where: {
+      resumeId: +resumeId,
+    },
+  });
+  if (!resume) {
+    return res.status(400).json({
+      message: '존재하지 않는 이력서입니다.',
+    });
   }
 
-  await prisma.documents.deleteOne({ documentId: documentId }).exec();
+  if (resume.userId !== user.userId) {
+    return res.status(400).json({
+      message: '올바르지 않은 요청입니다.',
+    });
+  }
+  await prisma.resume.delete({
+    where: {
+      resumeId: +resumeId,
+    },
+  });
 
-  return res.status(200).json({});
+  return res.status(201).end();
 });
 
 export default router;

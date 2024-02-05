@@ -61,7 +61,7 @@ router.post('/sign-in', async (req, res, next) => {
     return res.status(400).json({ message: '비밀번호를 입력해주세요.' });
   }
 
-  const user = await prisma.users.findFirst({ where: { email, password } });
+  const user = await prisma.users.findFirst({ where: { email } });
   if (!user) {
     return res.status(401).json({ message: '존재하지 않는 이메일입니다.' });
   }
@@ -73,33 +73,32 @@ router.post('/sign-in', async (req, res, next) => {
     expiresIn: '12h',
   });
 
-  // res.cookie('authorization', `Bearer ${accessToken}`);
   return res.status(200).json({ message: '로그인 성공', accessToken });
 });
 
 // 유저 상세정보 조회
 router.get('/me', authMiddleware, async (req, res, next) => {
-  const { userId } = res.locals.user;
+  const user = res.locals.user;
 
-  const user = await prisma.users.findFirst({
-    where: { userId: +userId },
-    select: {
-      userId: true,
-      email: true,
-      name: true,
-      createdAt: true,
-      updatedAt: true,
-      userInfos: {
-        select: {
-          age: true,
-          gender: true,
-          profileImage: true,
-        },
-      },
-    },
-  });
+  // const user = await prisma.users.findFirst({
+  //   where: { userId: +userId },
+  //   select: {
+  //     userId: true,
+  //     email: true,
+  //     name: true,
+  //     createdAt: true,
+  //     updatedAt: true,
+  //     userInfos: {
+  //       select: {
+  //         age: true,
+  //         gender: true,
+  //         profileImage: true,
+  //       },
+  //     },
+  //   },
+  // });
 
-  return res.status(200).json({ data: user });
+  return res.status(200).json({ email: user.email, name: user.name });
 });
 
 export default router;

@@ -51,7 +51,7 @@ model Resume {
 
   user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
   
-  @@map("Documents")
+  @@map("Resume")
 }
 
 

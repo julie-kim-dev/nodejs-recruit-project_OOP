@@ -2,7 +2,6 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import UsersRouter from './routers/users.router.js';
 import ResumeRouter from './routers/resume.router.js';
-// import AuthRouter from './routers/auth.router.js';
 
 const app = express();
 const PORT = 3020;

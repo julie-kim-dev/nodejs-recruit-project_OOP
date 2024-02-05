@@ -12,24 +12,24 @@ router.post('/sign-up', async (req, res, next) => {
     req.body;
 
   if (!email) {
-    return res.status(400), json({ message: '이메일을 입력해주세요.' });
+    return res.status(400).json({ message: '이메일을 입력해주세요.' });
   }
   if (!password) {
-    return res.status(400), json({ message: '비밀번호를 입력해주세요.' });
+    return res.status(400).json({ message: '비밀번호를 입력해주세요.' });
   }
   if (!passwordConfirm) {
-    return res.status(400), json({ message: '비밀번호 확인을 입력해주세요.' });
+    return res.status(400).json({ message: '비밀번호 확인을 입력해주세요.' });
   }
   if (!name) {
-    return res.status(400), json({ message: '이름을 입력해주세요.' });
+    return res.status(400).json({ message: '이름을 입력해주세요.' });
   }
   if (password.length < 6) {
-    return (
-      res.status(409), json({ message: '비밀번호는 6자리 이상이어야 합니다.' })
-    );
+    return res
+      .status(409)
+      .json({ message: '비밀번호는 6자리 이상이어야 합니다.' });
   }
   if (password !== passwordConfirm) {
-    return res.status(400), json({ message: '비밀번호가 일치하지 않습니다.' });
+    return res.status(400).json({ message: '비밀번호가 일치하지 않습니다.' });
   }
 
   const isExistUser = await prisma.users.findFirst({
@@ -51,7 +51,7 @@ router.post('/sign-up', async (req, res, next) => {
     data: {
       userId: user.userId,
       age,
-      gender: gender.toUpperCase(),
+      gender, //: gender.toUpperCase(),
       profileImage,
     },
   });

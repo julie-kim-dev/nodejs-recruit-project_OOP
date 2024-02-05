@@ -5,7 +5,7 @@ import authMiddleware from '../middlewares/need-signin.middleware.js';
 const router = express.Router();
 
 // 이력서 생성
-router.post('/documents', authMiddleware, async (req, res, next) => {
+router.post('/', authMiddleware, async (req, res, next) => {
   const { title, content, state } = req.body;
   const { userId } = req.user;
 
@@ -21,7 +21,7 @@ router.post('/documents', authMiddleware, async (req, res, next) => {
 });
 
 // 이력서 목록 조회
-router.get('/documents', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   const { name } = req.body;
 
   const documents = await prisma.documents.findMany({
@@ -43,7 +43,7 @@ router.get('/documents', async (req, res, next) => {
 });
 
 // 이력서 상세 조회
-router.get('/documents/:documentId', async (req, res, next) => {
+router.get('/:documentId', async (req, res, next) => {
   const { documentId } = req.params;
 
   const document = await prisma.documents.findFirst({
@@ -63,32 +63,28 @@ router.get('/documents/:documentId', async (req, res, next) => {
 });
 
 // 이력서 수정
-router.patch(
-  '/documents/:documentId',
-  authMiddleware,
-  async (req, res, next) => {
-    const { documentId } = req.params;
-    const { title, content, state } = req.body;
+router.patch('/:documentId', authMiddleware, async (req, res, next) => {
+  const { documentId } = req.params;
+  const { title, content, state } = req.body;
 
-    const editDocument = await prisma.documents.findById(documentId).exec();
-    if (!editDocument) {
-      return res
-        .status(404)
-        .json({ errorMessage: '존재하지 않는 이력서 데이터입니다.' });
-      if (title) {
-        const targetDocument = await prisma.documents.findOne({ title }).exec();
-        if (targetDocument) {
-          targetDocument.title = editDocument.title;
-          await targetDocument.save();
-        }
-        currentTodo.order = order;
+  const editDocument = await prisma.documents.findById(documentId).exec();
+  if (!editDocument) {
+    return res
+      .status(404)
+      .json({ errorMessage: '존재하지 않는 이력서 데이터입니다.' });
+    if (title) {
+      const targetDocument = await prisma.documents.findOne({ title }).exec();
+      if (targetDocument) {
+        targetDocument.title = editDocument.title;
+        await targetDocument.save();
       }
+      currentTodo.order = order;
     }
   }
-);
+});
 
 // 이력서 삭제
-router.delete('/documents/:documentId', authMiddleware, async (req, res) => {
+router.delete('/:documentId', authMiddleware, async (req, res) => {
   const { documentId } = req.params;
 
   const deleteDocuments = await prisma.documents.findById(documentId).exec();

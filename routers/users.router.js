@@ -78,7 +78,7 @@ router.post('/sign-in', async (req, res, next) => {
 });
 
 // 유저 상세정보 조회
-router.get('/users', authMiddleware, async (req, res, next) => {
+router.get('/', authMiddleware, async (req, res, next) => {
   const { userId } = req.user;
 
   const user = await prisma.users.findFirst({

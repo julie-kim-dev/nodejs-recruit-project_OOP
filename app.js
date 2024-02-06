@@ -1,5 +1,4 @@
 import express from 'express';
-import cookieParser from 'cookie-parser';
 import UsersRouter from './routers/users.router.js';
 import ResumeRouter from './routers/resume.router.js';
 
@@ -7,7 +6,6 @@ const app = express();
 const PORT = 3021;
 
 app.use(express.json());
-app.use(cookieParser());
 
 app.use('/users', UsersRouter);
 app.use('/resume', ResumeRouter);

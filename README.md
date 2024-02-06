@@ -6,13 +6,11 @@
 - DB_URL
 - JWT_SECRET
 - 그 밖의 사용한 환경변수를 나열해 주세요.
-- ACCESS_TOKEN_SECRET_KEY
-- REFRESH_TOKEN_SECRET_KEY
 
 # API 명세서 URL
 
 - 구글 Docs 공유 URL 추가
-- https://www.notion.so/julie-kim-dev/7e8baee1e091487c82b9fd46e16fb440?v=9028415530b340bb9a735e4ca2298ea4&pvs=4
+- https://www.notion.so/julie-kim-dev/a0f290df91c44fe2af2e5c2fea7aad01?v=0bfdf1284e6d4dfeb1c6d4b5957ed433&pvs=4
 
 # ERD URL
 

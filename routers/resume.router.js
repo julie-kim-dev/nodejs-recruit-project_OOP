@@ -173,7 +173,7 @@ router.delete('/:resumeId', authMiddleware, async (req, res, next) => {
     },
   });
 
-  return res.status(201).end();
+  return res.status(201).json({ message: '이력서 삭제가 완료되었습니다.' });
 });
 
 export default router;

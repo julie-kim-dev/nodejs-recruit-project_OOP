@@ -1,6 +1,6 @@
 import express from 'express';
-import { prisma } from '../utils/prisma/index.js';
-import authMiddleware from '../middlewares/need-signin.middleware.js';
+import { prisma } from '../src/utils/prisma/index.js';
+import authMiddleware from '../src/middlewares/need-signin.middleware.js';
 
 const router = express.Router();
 

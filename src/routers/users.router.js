@@ -3,10 +3,14 @@ import { prisma } from '../src/utils/prisma/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import authMiddleware from '../src/middlewares/need-signin.middleware.js';
+import { UsersController } from '../controllers/users.controller.js';
 
 const router = express.Router();
+const usersController = new UsersController();
 
 // 회원가입
+router.post('/sign-up', usersController.signUp);
+
 router.post('/sign-up', async (req, res, next) => {
   const { email, password, passwordConfirm, name, age, gender, profileImage } =
     req.body;

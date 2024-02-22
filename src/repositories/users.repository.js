@@ -19,7 +19,7 @@ export class UsersRepository {
 
   // 로그인
   selectOneUserByEmailAndPassword = async (email, password) => {
-    const user = await prisma.user.findFirst({
+    const user = await prisma.users.findFirst({
       where: {
         email,
         password,

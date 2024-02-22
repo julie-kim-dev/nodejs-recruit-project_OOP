@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../src/middlewares/need-signin.middleware.js';
+import authMiddleware from '../middlewares/need-signin.middleware.js';
 import { ResumesController } from '../controllers/resumes.controller.js';
 
 const router = express.Router();

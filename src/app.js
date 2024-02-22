@@ -1,6 +1,6 @@
 import express from 'express';
-import UsersRouter from '../routers/users.router.js';
-import ResumeRouter from '../routers/resume.router.js';
+import UsersRouter from './routers/users.router.js';
+import ResumeRouter from './routers/resume.router.js';
 
 const app = express();
 const PORT = 3021;

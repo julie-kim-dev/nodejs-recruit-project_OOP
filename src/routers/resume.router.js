@@ -1,5 +1,4 @@
 import express from 'express';
-import { prisma } from '../src/utils/prisma/index.js';
 import authMiddleware from '../src/middlewares/need-signin.middleware.js';
 import { ResumesController } from '../controllers/resumes.controller.js';
 
